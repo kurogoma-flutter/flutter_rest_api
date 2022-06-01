@@ -1,6 +1,6 @@
 # flutter_rest_api
 
-REST APIを用いて、Firebase外とデータ連携を行う。
+REST APIを用いてデータ連携を行う。
 
 ## Getting Started
 
