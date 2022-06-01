@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+void main() => runApp(const MyApp());
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -12,10 +14,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepOrange,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Flutter REST API'),
     );
   }
 }
@@ -30,12 +31,27 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  // APIのレスポンスを格納する
+  List items = [];
 
-  void _incrementCounter() {
+  Future<void> getData() async {
+    var response = await http.get(Uri.https(
+        'www.googleapis.com',
+        '/books/v1/volumes',
+        {'q': '{Flutter}', 'maxResults': '40', 'langRestrict': 'ja'}));
+
+    var jsonResponse = jsonDecode(response.body);
+
     setState(() {
-      _counter++;
+      items = jsonResponse['items'];
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    getData();
   }
 
   @override
@@ -43,26 +59,25 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text('Flutter REST API'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            child: Column(
+              children: <Widget>[
+                ListTile(
+                  leading: Image.network(
+                    items[index]['volumeInfo']['imageLinks']['thumbnail'],
+                  ),
+                  title: Text(items[index]['volumeInfo']['title']),
+                  subtitle: Text(items[index]['volumeInfo']['publishedDate']),
+                ),
+              ],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+          );
+        },
       ),
     );
   }
