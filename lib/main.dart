@@ -1,24 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rest_api/detail_page.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-void main() => runApp(const MyApp());
-
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
+  Widget build(BuildContext context) => MaterialApp.router(
+        routeInformationParser: _router.routeInformationParser,
+        routerDelegate: _router.routerDelegate,
+      );
+
+  final GoRouter _router = GoRouter(
+    routes: <GoRoute>[
+      GoRoute(
+        path: '/',
+        builder: (BuildContext context, GoRouterState state) =>
+            const MyHomePage(title: 'Flutter REST API'),
       ),
-      home: const MyHomePage(title: 'Flutter REST API'),
-    );
-  }
+      GoRoute(
+        path: '/book/:id', // 本の詳細を取得
+        builder: (context, state) {
+          // パスパラメータの値を取得するには state.params を使用
+          final String id = state.params['id']!;
+          return BookDetailPage(id: id);
+        },
+      ),
+    ],
+    initialLocation: '/',
+  );
 }
 
 class MyHomePage extends StatefulWidget {
@@ -38,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var response = await http.get(Uri.https(
         'www.googleapis.com',
         '/books/v1/volumes',
-        {'q': '{Flutter}', 'maxResults': '40', 'langRestrict': 'ja'}));
+        {'q': '{Flutter}', 'maxResults': '35', 'langRestrict': 'ja'}));
 
     var jsonResponse = jsonDecode(response.body);
 
@@ -50,13 +65,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-
     getData();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter REST API'),
@@ -67,13 +80,26 @@ class _MyHomePageState extends State<MyHomePage> {
           return Card(
             child: Column(
               children: <Widget>[
-                ListTile(
-                  leading: Image.network(
-                    items[index]['volumeInfo']['imageLinks']['thumbnail'],
-                  ),
-                  title: Text(items[index]['volumeInfo']['title']),
-                  subtitle: Text(items[index]['volumeInfo']['publishedDate']),
-                ),
+                items[index] != null
+                    ? GestureDetector(
+                        child: ListTile(
+                          leading: Image.network(
+                            items[index]['volumeInfo']['imageLinks']
+                                    ['thumbnail'] ??
+                                '',
+                          ),
+                          title:
+                              Text(items[index]['volumeInfo']['title'] ?? ''),
+                          subtitle: Text(items[index]['volumeInfo']
+                                  ['publishedDate'] ??
+                              ''),
+                        ),
+                        onTap: () {
+                          // 詳細画面へ遷移
+                          context.go('/book/${items[index]['id']}');
+                        },
+                      )
+                    : const SizedBox(),
               ],
             ),
           );
