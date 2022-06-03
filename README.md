@@ -5,4 +5,6 @@ FlutterでREST APIを用いてデータ連携を行う。
 ## コード概要
 
 今回のコードについては、Qittaで説明をしました。
+
+<br />
 https://qiita.com/kurogoma939/items/cf35ff72f144b71b5974
