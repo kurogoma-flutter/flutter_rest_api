@@ -1,16 +1,8 @@
 # flutter_rest_api
 
-REST APIを用いてデータ連携を行う。
+FlutterでREST APIを用いてデータ連携を行う。
 
-## Getting Started
+## コード概要
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+今回のコードについては、Qittaで説明をしました。
+https://qiita.com/kurogoma939/items/cf35ff72f144b71b5974
